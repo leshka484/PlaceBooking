@@ -1,0 +1,45 @@
+[tool.mypy]
+plugins = ["sqlalchemy.ext.mypy.plugin"]
+python_version = "3.10"
+
+[tool.ruff]
+# Каталог, где лежит твой код (обычно app или src)
+src = ["app"]
+
+# Максимальная длина строки (совместимо с black)
+line-length = 88
+
+# Игнорируем папки, которые не нужно проверять
+exclude = [
+    ".venv",
+    "migrations",
+    "__pycache__",
+]
+
+# Включаем категории правил (базовые + стиль + async)
+select = [
+    "E",   # Pycodestyle errors
+    "F",   # Pyflakes
+    "I",   # Import sorting
+    "B",   # Bugbear
+    "UP",  # Pyupgrade
+    "ASYNC", # Асинхронные проверки
+    "Q",   # Quotes consistency
+]
+
+# Если нужно что-то не проверять
+ignore = [
+    "E501",  # длина строки (если мешает)
+]
+
+# Настройки автоформатирования импортов
+[tool.ruff.isort]
+known-first-party = ["app"]
+combine-as-imports = true
+
+# Можно включить автоформатирование (аналог black)
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
