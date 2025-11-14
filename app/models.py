@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, String, Text, UniqueConstraint
+from sqlalchemy import Column, DateTime, ForeignKey, String, Table, Text, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -43,6 +43,14 @@ class Location(Base):
     resources: Mapped[list[Resource]] = relationship(back_populates="location")
 
 
+resource_tags = Table(
+    "resource_tags",
+    Base.metadata,
+    Column("resource_id", ForeignKey("resources.id"), primary_key=True),
+    Column("tag_id", ForeignKey("tags.id"), primary_key=True),
+)
+
+
 class Resource(Base):
     __tablename__ = "resources"
 
@@ -54,7 +62,9 @@ class Resource(Base):
     location: Mapped[Location] = relationship(back_populates="resources")
     type: Mapped[ResourceType] = relationship(back_populates="resources")
     bookings: Mapped[list[Booking]] = relationship(back_populates="resource")
-    tags: Mapped[list[ResourceTag]] = relationship(back_populates="resource")
+    tags: Mapped[list[Tag]] = relationship(
+        "Tag", secondary=resource_tags, back_populates="resources"
+    )
 
 
 class ResourceType(Base):
@@ -67,24 +77,16 @@ class ResourceType(Base):
     tags: Mapped[list[Tag]] = relationship(back_populates="resource_type")
 
 
-class ResourceTag(Base):
-    __tablename__ = "resource_tags"
-    
-    resource_id: Mapped[int] = mapped_column(
-        ForeignKey("resources.id"), primary_key=True
-    )
-    tag_id: Mapped[int] = mapped_column(ForeignKey("tags.id"), primary_key=True)
-
-
 class Tag(Base):
     __tablename__ = "tags"
     
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), unique=True)
     resource_type_id: Mapped[int] = mapped_column(ForeignKey("resource_types.id"))
-    resource_type: Mapped[str] = relationship(back_populates="tags")
-    resource_links: Mapped[list[ResourceTag]] = relationship(back_populates="tag")
-    pass
+    resource_type: Mapped[ResourceType] = relationship(back_populates="tags")
+    resources: Mapped[list[Resource]] = relationship(
+        "Resource", secondary=resource_tags, back_populates="tags"
+    )
 
 
 class Booking(Base):
