@@ -1,6 +1,7 @@
 [tool.mypy]
 plugins = ["sqlalchemy.ext.mypy.plugin"]
 python_version = "3.10"
+ignore_missing_imports = true
 
 [tool.ruff]
 # Каталог, где лежит твой код (обычно app или src)
@@ -8,6 +9,8 @@ src = ["app"]
 
 # Максимальная длина строки (совместимо с black)
 line-length = 88
+
+ignore = ["B008"]
 
 # Игнорируем папки, которые не нужно проверять
 exclude = [
@@ -25,11 +28,6 @@ select = [
     "UP",  # Pyupgrade
     "ASYNC", # Асинхронные проверки
     "Q",   # Quotes consistency
-]
-
-# Если нужно что-то не проверять
-ignore = [
-    "E501",  # длина строки (если мешает)
 ]
 
 # Настройки автоформатирования импортов
