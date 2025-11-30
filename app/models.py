@@ -1,8 +1,16 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 
-from sqlalchemy import Column, DateTime, ForeignKey, String, Table, Text, UniqueConstraint
+from sqlalchemy import (
+    Column,
+    DateTime,
+    ForeignKey,
+    String,
+    Table,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -83,6 +91,7 @@ class Tag(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), unique=True)
     resource_type_id: Mapped[int] = mapped_column(ForeignKey("resource_types.id"))
+    
     resource_type: Mapped[ResourceType] = relationship(back_populates="tags")
     resources: Mapped[list[Resource]] = relationship(
         "Resource", secondary=resource_tags, back_populates="tags"
@@ -100,10 +109,12 @@ class Booking(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     resource_id: Mapped[int] = mapped_column(ForeignKey("resources.id"))
-    start_time: Mapped[datetime]
-    end_time: Mapped[datetime]
-    status: Mapped[str] = mapped_column(String(20), default="active")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    start_time: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    end_time: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    status: Mapped[str] = mapped_column(String(20), default="upcoming")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
 
     user: Mapped[User] = relationship(back_populates="bookings")
     resource: Mapped[Resource] = relationship(back_populates="bookings")
