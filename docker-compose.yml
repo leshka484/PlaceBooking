@@ -27,6 +27,29 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+  
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    env_file:
+      - .env
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+  
+  celery_worker:
+    build: .
+    command: celery -A app.core.celery_app worker --loglevel=INFO
+    depends_on:
+      - rabbitmq
+
+  celery_beat:
+    build: .
+    command: celery -A app.core.celery_app beat --loglevel=INFO
+    depends_on:
+      - rabbitmq
 
 volumes:
   postgres_data:

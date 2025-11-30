@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from enum import Enum
 
 from sqlalchemy import (
     Column,
@@ -129,3 +130,8 @@ class RefreshToken(Base):
     expires_at: Mapped[datetime]
 
     user: Mapped[User] = relationship(back_populates="refresh_tokens")
+    
+class BookingStatus(str, Enum):
+    upcoming = "upcoming"
+    active = "active"
+    ended = "ended"
