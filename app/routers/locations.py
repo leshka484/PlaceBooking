@@ -2,18 +2,24 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from app.core.dependencies import get_current_user
 from app.database import get_db
 from app.models import Location
 from app.schemas.locations import LocationCreate, LocationRead
 
-router = APIRouter(prefix="/locations", tags=["Locations"])
+router = APIRouter(
+    prefix="/locations", tags=["Locations"], dependencies=[Depends(get_current_user)]
+)
 
 
 @router.post(
-    "/", response_model=LocationRead, status_code=status.HTTP_201_CREATED
+    "/",
+    response_model=LocationRead,
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_location(
-    location_data: LocationCreate, session: AsyncSession = Depends(get_db)
+    location_data: LocationCreate,
+    session: AsyncSession = Depends(get_db),
 ):
     # Проверяем, нет ли уже локации с таким именем
     result = await session.execute(

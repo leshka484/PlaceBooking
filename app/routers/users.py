@@ -1,19 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.security import hash_password
 from app.database import get_db
 from app.models import User
 from app.schemas.users import UserCreate, UserRead
 
 router = APIRouter(prefix="/users", tags=["Users"])
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
 
 @router.get("/", response_model=list[UserRead])
 async def get_users(db: AsyncSession = Depends(get_db)):

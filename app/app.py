@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from app.routers import (
+    auth,
     booking,
     locations,
     main,
@@ -21,3 +22,4 @@ app.include_router(resource_type.router)
 app.include_router(resource.router)
 app.include_router(tag.router)
 app.include_router(booking.router)
+app.include_router(auth.router)
